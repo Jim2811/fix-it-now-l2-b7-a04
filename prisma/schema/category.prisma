@@ -1,0 +1,11 @@
+model Category {
+  id String @id @default(cuid())
+
+  name        String  @unique
+  description String?
+
+  services Service[]
+
+  createdAt DateTime @default(now())
+  @@map("category")
+}
