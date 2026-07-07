@@ -1,5 +1,5 @@
 model Availability {
-  id String @id @default(cuid())
+  id String @id @default(uuid())
 
   technicianId String
   technician   TechnicianProfile @relation(fields: [technicianId], references: [id])

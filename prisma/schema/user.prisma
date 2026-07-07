@@ -1,11 +1,11 @@
 model User {
-  id       String @id @default(cuid())
+  id       String @id @default(uuid())
   name     String
   email    String @unique
   password String
 
   role   Role
-  status UserStatus @default(ACTIVE)
+  status UserStatus @default(UNBAN)
 
   phone      String?
   address    String?

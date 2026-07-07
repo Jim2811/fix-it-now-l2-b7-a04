@@ -1,5 +1,5 @@
 model Review {
-  id String @id @default(cuid())
+  id String @id @default(uuid())
 
   bookingId String  @unique
   booking   Booking @relation(fields: [bookingId], references: [id])
