@@ -6,7 +6,7 @@ enum Role {
 
 enum UserStatus {
   UNBAN
-  BAN
+  BANNED
 }
 
 enum BookingStatus {
@@ -14,6 +14,7 @@ enum BookingStatus {
   ACCEPTED
   DECLINED
   PAID
+  IN_PROGRESS
   COMPLETED
   CANCELLED
 }
@@ -28,9 +29,12 @@ enum PaymentProvider {
   STRIPE
   SSLCOMMERZ
 }
-
-enum PaymentMethod {
-  CARD
-  MOBILE_BANKING
-  BANK_TRANSFER
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
 }

@@ -1,13 +1,12 @@
 model Availability {
-  id String @id @default(uuid())
-
+  id           String            @id @default(uuid())
   technicianId String
-  technician   TechnicianProfile @relation(fields: [technicianId], references: [id])
+  technician   TechnicianProfile @relation(fields: [technicianId], references: [id], onDelete: Cascade)
+  dayOfWeek    DayOfWeek
+  startTime    String            
+  endTime      String           
+  isAvailable  Boolean           @default(true)
 
-  dayOfWeek String
-  startTime String
-  endTime   String
-
-  isAvailable Boolean @default(true)
+  @@unique([technicianId, dayOfWeek, startTime, endTime])
   @@map("availability")
 }

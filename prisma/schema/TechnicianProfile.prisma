@@ -1,9 +1,8 @@
 model TechnicianProfile {
   id String @id @default(uuid())
-
   userId String @unique
   user   User   @relation(fields: [userId], references: [id])
-
+  skills String[]
   bio        String?
   experience Int
   hourlyRate Float

@@ -1,18 +1,17 @@
 model Review {
-  id String @id @default(uuid())
-
-  bookingId String  @unique
-  booking   Booking @relation(fields: [bookingId], references: [id])
-
-  customerId String
-  customer   User   @relation(fields: [customerId], references: [id])
-
+  id           String   @id @default(uuid())
+  bookingId    String   @unique // একটি বুকিংয়ের বিপরীতে একটিই রিভিউ হবে
+  customerId   String
   technicianId String
-  technician   TechnicianProfile @relation(fields: [technicianId], references: [id])
+  rating       Int      
+  comment      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  rating  Int
-  comment String?
+  // Relations
+  booking    Booking           @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  customer   User              @relation("CustomerReviews", fields: [customerId], references: [id], onDelete: Cascade)
+  technician TechnicianProfile @relation(fields: [technicianId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
-  @@map("review")
+  @@map("reviews")
 }
