@@ -1,19 +1,21 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "../lib/prisma";
 import config from "../config";
-import { RegisterUserPayload } from "./auth.interface";
+import { IRegisterUserPayload } from "./auth.interface";
+import { jwtUtils } from "../utils/jwtUtils";
+import { SignOptions } from "jsonwebtoken";
 
-const registerUserInDB = async (payload: RegisterUserPayload) => {
+const registerUserInDB = async (payload: IRegisterUserPayload) => {
     const { name, email, password, profileImg, role, address, phone } = payload;
     const existingUser = await prisma.user.findUnique({
         where: {
             email,
         },
     });
-    if(existingUser) {
+    if (existingUser) {
         throw new Error("User with this email already exists");
     }
-    const hashedPassword = await bcrypt.hash(password, config.bcrypt_salt_rounds );
+    const hashedPassword = await bcrypt.hash(password, config.bcrypt_salt_rounds);
     const newUser = await prisma.user.create({
         data: {
             name,
@@ -45,18 +47,35 @@ const loginUserInDB = async (payload: { email: string; password: string }) => {
         }
     });
 
-    if(!user) {
+    if (!user) {
         throw new Error("User not found");
     };
-    if(user.status == "BANNED") {
+    if (user.status == "BANNED") {
         throw new Error("Your account is banned");
     }
     const comparePassword = await bcrypt.compare(password, user.password);
-    if(!comparePassword) {
+    if (!comparePassword) {
         throw new Error("Invalid password");
     };
     delete (user as any).password;
-    return user
+    const jwtPayload = user
+    const accessToken = jwtUtils.createToken(
+        jwtPayload,
+        config.jwt_access_secret,
+        config.jwt_access_expires_in as SignOptions
+    );
+    
+    const refreshToken = jwtUtils.createToken(
+        jwtPayload,
+        config.jwt_refresh_secret,
+        config.jwt_refresh_expires_in as SignOptions
+    );
+
+    return {
+        user,
+        accessToken,
+        refreshToken
+    }
 
 }
 export const authService = {
