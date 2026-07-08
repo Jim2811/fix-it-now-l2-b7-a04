@@ -65,6 +65,60 @@ const createBookingIntoDB = async (customerId: string, payload: ICreateBookingPa
     return booking;
 };
 
+const getMyBookingsFromDB = async (customerId: string) => {
+    return prisma.booking.findMany({
+        where: {
+            customerId,
+        },
+        orderBy: {
+            createdAt: "desc",
+        },
+        include: {
+            customer: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    phone: true,
+                    address: true,
+                    role: true,
+                    status: true,
+                    profileImg: true,
+                },
+            },
+            technician: {
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            name: true,
+                            email: true,
+                            phone: true,
+                            address: true,
+                            role: true,
+                            status: true,
+                            profileImg: true,
+                        },
+                    },
+                    services: {
+                        include: {
+                            category: true,
+                        },
+                    },
+                },
+            },
+            service: {
+                include: {
+                    category: true,
+                },
+            },
+            payment: true,
+            review: true,
+        },
+    });
+};
+
 export const bookingService = {
     createBookingIntoDB,
+    getMyBookingsFromDB,
 };
