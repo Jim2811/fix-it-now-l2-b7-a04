@@ -118,7 +118,83 @@ const getMyBookingsFromDB = async (customerId: string) => {
     });
 };
 
+const getBookingByIdFromDB = async (customerId: string, bookingId: string) => {
+    const booking = await prisma.booking.findFirst({
+        where: {
+            id: bookingId,
+            customerId,
+        },
+        include: {
+            customer: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    phone: true,
+                    address: true,
+                    role: true,
+                    status: true,
+                    profileImg: true,
+                },
+            },
+            technician: {
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            name: true,
+                            email: true,
+                            phone: true,
+                            address: true,
+                            role: true,
+                            status: true,
+                            profileImg: true,
+                        },
+                    },
+                    services: {
+                        include: {
+                            category: true,
+                        },
+                    },
+                    availability: true,
+                    reviews: true,
+                },
+            },
+            service: {
+                include: {
+                    category: true,
+                    technician: {
+                        include: {
+                            user: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    email: true,
+                                    phone: true,
+                                    address: true,
+                                    role: true,
+                                    status: true,
+                                    profileImg: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+            payment: true,
+            review: true,
+        },
+    });
+
+    if (!booking) {
+        throw new Error("Booking not found");
+    }
+
+    return booking;
+};
+
 export const bookingService = {
     createBookingIntoDB,
     getMyBookingsFromDB,
+    getBookingByIdFromDB,
 };

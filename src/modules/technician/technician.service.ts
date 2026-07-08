@@ -1,3 +1,4 @@
+import { BookingStatus } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 import { IUpdateTechnicianPayload } from "./technician.interface";
 
@@ -95,7 +96,115 @@ const addAvailabilityIntoDB = async (userId: string, payload: any[]) => {
 
     return await prisma.$transaction(queries);
 };
+
+const getTechnicianBookingsFromDB = async (technicianUserId: string) => {
+    const technicianProfile = await prisma.technicianProfile.findUniqueOrThrow({
+        where: { userId: technicianUserId },
+        select: { id: true },
+    });
+
+    return prisma.booking.findMany({
+        where: {
+            technicianId: technicianProfile.id,
+        },
+        orderBy: {
+            createdAt: "desc",
+        },
+        include: {
+            customer: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    phone: true,
+                    address: true,
+                    role: true,
+                    status: true,
+                    profileImg: true,
+                },
+            },
+            service: {
+                include: {
+                    category: true,
+                },
+            },
+            payment: true,
+            review: true,
+        },
+    });
+};
+
+type TUpdateBookingStatusPayload = {
+    status: BookingStatus;
+};
+
+const updateBookingStatusIntoDB = async (
+    technicianUserId: string,
+    bookingId: string,
+    payload: TUpdateBookingStatusPayload
+) => {
+    const { status } = payload;
+
+    const technicianProfile = await prisma.technicianProfile.findUniqueOrThrow({
+        where: { userId: technicianUserId },
+        select: { id: true },
+    });
+
+    const booking = await prisma.booking.findFirst({
+        where: {
+            id: bookingId,
+            technicianId: technicianProfile.id,
+        },
+    });
+
+    if (!booking) {
+        throw new Error("Booking not found");
+    }
+
+    const allowedTransitions: Record<BookingStatus, BookingStatus[]> = {
+        REQUESTED: [BookingStatus.ACCEPTED, BookingStatus.DECLINED, BookingStatus.CANCELLED],
+        ACCEPTED: [BookingStatus.IN_PROGRESS, BookingStatus.CANCELLED],
+        DECLINED: [],
+        PAID: [BookingStatus.IN_PROGRESS, BookingStatus.CANCELLED],
+        IN_PROGRESS: [BookingStatus.COMPLETED, BookingStatus.CANCELLED],
+        COMPLETED: [],
+        CANCELLED: [],
+    };
+
+    if (!allowedTransitions[booking.status].includes(status)) {
+        throw new Error(`Cannot change booking status from ${booking.status} to ${status}`);
+    }
+
+    return prisma.booking.update({
+        where: { id: booking.id },
+        data: { status },
+        include: {
+            customer: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    phone: true,
+                    address: true,
+                    role: true,
+                    status: true,
+                    profileImg: true,
+                },
+            },
+            service: {
+                include: {
+                    category: true,
+                },
+            },
+            payment: true,
+            review: true,
+        },
+    });
+};
+
 export const technicianService = {
     updateTechnicianProfileIntoDB,
-    addAvailabilityIntoDB
+    addAvailabilityIntoDB,
+    getTechnicianBookingsFromDB,
+    updateBookingStatusIntoDB,
 };
