@@ -12,5 +12,7 @@ model Service {
   technician TechnicianProfile @relation(fields: [technicianId], references: [id], onDelete: Cascade)
   bookings   Booking[]
 
+  @@unique([technicianId, categoryId, name])
+
   @@map("services")
 }
