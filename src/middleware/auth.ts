@@ -41,17 +41,21 @@ export const auth = (...requiredRoles: Role[]) => {
             throw new Error(verifiedToken.error || "Invalid token");
         }
 
-        const { id, email, name, role, phone, address, status, profileImg } = verifiedToken.data as JwtPayload;
-
-        if (requiredRoles.length && !requiredRoles.includes(role)) {
-            throw new Error("Forbidden. You don't have permission to access this resource.");
-        }
+        const { id } = verifiedToken.data as JwtPayload;
         const user = await prisma.user.findUnique({
-            where: { id, email, name, role, phone, address, status, profileImg },
+            where: { id: id as string },
         });
 
         if (!user) {
             throw new Error("The user belonging to this token no longer exists.");
+        }
+
+        if (requiredRoles.length && !requiredRoles.includes(user.role)) {
+            throw new Error("Forbidden. You don't have permission to access this resource.");
+        }
+
+        if (user.status === UserStatus.BANNED) {
+            throw new Error("Your account is banned");
         }
 
         req.user = user;
