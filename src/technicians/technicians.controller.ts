@@ -15,6 +15,19 @@ const getMyProfile = catchAsync(async (req: Request, res: Response, next: NextFu
     });
 });
 
+const getAllTechnicians = catchAsync(async (req: Request, res: Response) => {
+    const result = await techniciansService.getAllTechniciansFromDB(req.query);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: 200,
+        message: "Technicians fetched successfully",
+        data: result,
+    });
+});
+
+
 export const techniciansController = {
-    getMyProfile
+    getMyProfile,
+    getAllTechnicians,
 };
