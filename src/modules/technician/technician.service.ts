@@ -43,8 +43,37 @@ const updateTechnicianProfileIntoDB = async (technicianId: string, payload: IUpd
     });
 };
 
+const addAvailabilityIntoDB = async (userId: string, payload: any[]) => {
+    const technician = await prisma.technicianProfile.findUniqueOrThrow({
+        where: { userId }
+    });
 
+    const queries = payload.map((slot) =>
+        prisma.availability.upsert({
+            where: {
+                technicianId_dayOfWeek_startTime_endTime: {
+                    technicianId: technician.id,
+                    dayOfWeek: slot.dayOfWeek,
+                    startTime: slot.startTime,
+                    endTime: slot.endTime,
+                },
+            },
+            update: {
+                isAvailable: slot.isAvailable,
+            },
+            create: {
+                technicianId: technician.id,
+                dayOfWeek: slot.dayOfWeek,
+                startTime: slot.startTime,
+                endTime: slot.endTime,
+                isAvailable: slot.isAvailable ?? true,
+            },
+        })
+    );
 
+    return await prisma.$transaction(queries);
+};
 export const technicianService = {
     updateTechnicianProfileIntoDB,
+    addAvailabilityIntoDB
 };

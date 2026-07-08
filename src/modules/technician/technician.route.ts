@@ -5,4 +5,5 @@ import { Role } from "../../../generated/prisma/client";
 const router = Router();
 
 router.put("/profile", auth(Role.TECHNICIAN), technicianController.updateTechnicainProfile);
+router.put("/availability", auth(Role.TECHNICIAN), technicianController.addAvailability);
 export const technicianRouter = router;
