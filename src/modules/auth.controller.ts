@@ -38,7 +38,20 @@ const loginUser = catchAsync(async (req: Request, res: Response, next: NextFunct
         data: { user }
     })
 });
+const getMyProfile = catchAsync( async (req: Request, res: Response, next: NextFunction) => {
+
+    const profile = await authService.getMyProfileFromDB(req.user?.id as string);
+
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "User profile fetched successfully",
+        data: { profile }
+    })
+})
 export const authController = {
     registerUser,
-    loginUser
+    loginUser,
+    getMyProfile
 };
