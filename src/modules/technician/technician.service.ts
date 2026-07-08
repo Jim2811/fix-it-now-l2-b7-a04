@@ -43,6 +43,8 @@ const updateTechnicianProfileIntoDB = async (technicianId: string, payload: IUpd
     });
 };
 
+
+
 export const technicianService = {
     updateTechnicianProfileIntoDB,
 };
