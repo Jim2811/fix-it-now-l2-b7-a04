@@ -1,6 +1,13 @@
 import { Prisma } from "../../generated/prisma/client";
 import { prisma } from "../lib/prisma";
 
+type ICreateServicePayload = {
+    name: string;
+    description: string;
+    price: number | string;
+    categoryId: string;
+};
+
 type TGetServicesQuery = {
     searchTerm?: string;
     categoryId?: string;
@@ -109,6 +116,70 @@ const getAllServicesFromDB = async (query: TGetServicesQuery) => {
     return services;
 };
 
+const createServiceIntoDB = async (technicianId: string, payload: ICreateServicePayload) => {
+    const { name, description, price, categoryId } = payload;
+
+    const technicianProfile = await prisma.technicianProfile.findUnique({
+        where: { userId: technicianId },
+        select: { id: true },
+    });
+
+    if (!technicianProfile) {
+        throw new Error("Technician profile not found");
+    }
+
+    const category = await prisma.category.findUnique({
+        where: { id: categoryId },
+        select: { id: true },
+    });
+
+    if (!category) {
+        throw new Error("Category not found");
+    }
+
+    const existingService = await prisma.service.findFirst({
+        where: {
+            technicianId: technicianProfile.id,
+            name,
+            categoryId,
+        },
+    });
+
+    if (existingService) {
+        throw new Error("Service already exists for this technician and category");
+    }
+
+    return prisma.service.create({
+        data: {
+            technicianId: technicianProfile.id,
+            name,
+            description,
+            price: Number(price),
+            categoryId,
+        },
+        include: {
+            category: true,
+            technician: {
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            name: true,
+                            email: true,
+                            phone: true,
+                            address: true,
+                            role: true,
+                            status: true,
+                            profileImg: true,
+                        },
+                    },
+                },
+            },
+        },
+    });
+};
+
 export const serviceService = {
     getAllServicesFromDB,
+    createServiceIntoDB,
 };

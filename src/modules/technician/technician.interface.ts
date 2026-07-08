@@ -7,10 +7,4 @@ export interface IUpdateTechnicianPayload {
     bio?: string | null;
     experience?: number | string;
     hourlyRate?: number | string;
-    services?: {
-        name: string;
-        description: string;
-        price: number | string;
-        categoryId: string;
-    }[];
 }

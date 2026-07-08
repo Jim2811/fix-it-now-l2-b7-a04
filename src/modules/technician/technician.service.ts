@@ -2,7 +2,7 @@ import { prisma } from "../../lib/prisma";
 import { IUpdateTechnicianPayload } from "./technician.interface";
 
 const updateTechnicianProfileIntoDB = async (technicianId: string, payload: IUpdateTechnicianPayload) => {
-    const { name, phone, address, profileImg, experience, hourlyRate, services, ...profileData } = payload;
+    const { name, phone, address, profileImg, experience, hourlyRate, ...profileData } = payload;
 
     return await prisma.$transaction(async (tx) => {
         const userData: Record<string, unknown> = {};
@@ -39,50 +39,6 @@ const updateTechnicianProfileIntoDB = async (technicianId: string, payload: IUpd
                 hourlyRate: hourlyRate !== undefined ? Number(hourlyRate) : 0,
             },
         });
-
-        if (services?.length) {
-            const categoryIds = [...new Set(services.map((service) => service.categoryId))];
-            const existingCategories = await tx.category.findMany({
-                where: { id: { in: categoryIds } },
-                select: { id: true },
-            });
-
-            if (existingCategories.length !== categoryIds.length) {
-                throw new Error("One or more categories not found");
-            }
-
-            await Promise.all(
-                services.map(async (service) => {
-                    const existingService = await tx.service.findFirst({
-                        where: {
-                            technicianId: technicianProfile.id,
-                            name: service.name,
-                            categoryId: service.categoryId,
-                        },
-                    });
-
-                    if (existingService) {
-                        return tx.service.update({
-                            where: { id: existingService.id },
-                            data: {
-                                description: service.description,
-                                price: Number(service.price),
-                            },
-                        });
-                    }
-
-                    return tx.service.create({
-                        data: {
-                            technicianId: technicianProfile.id,
-                            name: service.name,
-                            description: service.description,
-                            price: Number(service.price),
-                            categoryId: service.categoryId,
-                        },
-                    });
-                })
-            );
-        }
 
         return await tx.technicianProfile.findUniqueOrThrow({
             where: { id: technicianProfile.id },

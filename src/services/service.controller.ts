@@ -15,6 +15,19 @@ const getAllServices = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const createService = catchAsync(async (req: Request, res: Response) => {
+    const technicianId = req.user?.id as string;
+    const service = await serviceService.createServiceIntoDB(technicianId, req.body);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.CREATED,
+        message: "Service created successfully",
+        data: service,
+    });
+});
+
 export const serviceController = {
     getAllServices,
+    createService,
 };
