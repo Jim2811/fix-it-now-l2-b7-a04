@@ -16,7 +16,15 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateUserStatus = catchAsync(async (req: Request, res: Response) => {
-    
+    const userId = req.params.id;
+    const updatedUser = await userService.updateUserStatusIntoDB(userId as string, req.body);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "User status updated successfully",
+        data: updatedUser,
+    });
 });
 
 export const userController = {
