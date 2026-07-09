@@ -8,6 +8,8 @@ import { authRoutes } from "./modules/auth/auth.route";
 import { technicianRouter } from "./modules/technician/technician.route";
 import { techniciansRouter } from "./technicians/technicians.route";
 import { serviceRoutes } from "./services/service.route";
+import { paymentRoutes } from "./payments/payment.route";
+import { paymentController } from "./payments/payment.controller";
 
 const app : Application = express();
 
@@ -16,6 +18,7 @@ app.use(cors({
     credentials : true,
 }))
 
+app.post("/api/payments/webhook", express.raw({ type: "application/json" }), paymentController.handleStripeWebhook);
 app.use(express.json());
 app.use(express.urlencoded({ extended : true }));
 app.use(cookieParser());
@@ -29,6 +32,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/services", serviceRoutes);
+app.use("/api/payments", paymentRoutes);
 app.use("/api/technician", technicianRouter);
 app.use("/api/technicians", techniciansRouter);
 export default app;
