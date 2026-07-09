@@ -1,10 +1,10 @@
 import httpStatus from "http-status";
 import { Request, Response } from "express";
-import { catchAsync } from "../utils/catchAsync";
-import { sendResponse } from "../utils/sendResponse";
+import { catchAsync } from "../../utils/catchAsync";
+import { sendResponse } from "../../utils/sendResponse";
 import { paymentService } from "./payment.service";
 import Stripe from "stripe";
-import config from "../config";
+import config from "../../config";
 
 const createPayment = catchAsync(async (req: Request, res: Response) => {
     const customerId = req.user?.id as string;

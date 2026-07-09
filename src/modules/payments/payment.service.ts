@@ -1,8 +1,8 @@
 import Stripe from "stripe";
-import config from "../config";
-import { prisma } from "../lib/prisma";
+import config from "../../config";
+import { prisma } from "../../lib/prisma";
 import { IConfirmPaymentPayload, ICreatePaymentPayload } from "./payment.interface";
-import { BookingStatus, PaymentStatus, PaymentProvider } from "../../generated/prisma/enums";
+import { BookingStatus, PaymentStatus, PaymentProvider } from "../../../generated/prisma/enums";
 
 const stripe = new Stripe(config.stripe_secret_key, {
     apiVersion: "2026-06-24.dahlia",

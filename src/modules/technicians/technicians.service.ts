@@ -1,4 +1,4 @@
-import { prisma } from "../lib/prisma";
+import { prisma } from "../../lib/prisma";
 
 const getTechnicianProfileFromDB = async (technicianId: string) => {
     const profile = await prisma.technicianProfile.findUnique({

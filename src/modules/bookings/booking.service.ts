@@ -1,4 +1,4 @@
-import { prisma } from "../lib/prisma";
+import { prisma } from "../../lib/prisma";
 import { ICreateBookingPayload } from "./booking.interface";
 
 const createBookingIntoDB = async (customerId: string, payload: ICreateBookingPayload) => {

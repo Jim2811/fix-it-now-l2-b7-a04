@@ -1,7 +1,7 @@
 import httpStatus from "http-status";
 import { Request, Response } from "express";
-import { catchAsync } from "../utils/catchAsync";
-import { sendResponse } from "../utils/sendResponse";
+import { catchAsync } from "../../utils/catchAsync";
+import { sendResponse } from "../../utils/sendResponse";
 import { bookingService } from "./booking.service";
 
 const createBooking = catchAsync(async (req: Request, res: Response) => {
@@ -31,7 +31,7 @@ const getMyBookings = catchAsync(async (req: Request, res: Response) => {
 const getBookingById = catchAsync(async (req: Request, res: Response) => {
     const customerId = req.user?.id as string;
     const bookingId = req.params.id;
-    const booking = await bookingService.getBookingByIdFromDB(customerId, bookingId);
+    const booking = await bookingService.getBookingByIdFromDB(customerId, bookingId as string);
 
     sendResponse(res, {
         success: true,

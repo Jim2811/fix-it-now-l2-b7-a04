@@ -3,13 +3,14 @@ import cors from "cors";
 import express, { Application, Request, Response } from "express";
 import config from "./config";
 import { adminRoutes } from "./admin/admin.route";
-import { bookingRoutes } from "./bookings/booking.route";
+import { bookingRoutes } from "./modules/bookings/booking.route";
 import { authRoutes } from "./modules/auth/auth.route";
 import { technicianRouter } from "./modules/technician/technician.route";
-import { techniciansRouter } from "./technicians/technicians.route";
-import { serviceRoutes } from "./services/service.route";
-import { paymentRoutes } from "./payments/payment.route";
-import { paymentController } from "./payments/payment.controller";
+import { techniciansRouter } from "./modules/technicians/technicians.route";
+import { serviceRoutes } from "./modules/services/service.route";
+import { paymentRoutes } from "./modules/payments/payment.route";
+import { paymentController } from "./modules/payments/payment.controller";
+import { reviewRoutes } from "./modules/reviews/review.route";
 
 const app : Application = express();
 
@@ -33,6 +34,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/reviews", reviewRoutes);
 app.use("/api/technician", technicianRouter);
 app.use("/api/technicians", techniciansRouter);
 export default app;

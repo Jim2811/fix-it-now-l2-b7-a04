@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { Role } from "../../generated/prisma/client";
-import { auth } from "../middleware/auth";
+import { Role } from "../../../generated/prisma/client";
+import { auth } from "../../middleware/auth";
 import { paymentController } from "./payment.controller";
 import { paymentValidation } from "./payment.validation";
 
