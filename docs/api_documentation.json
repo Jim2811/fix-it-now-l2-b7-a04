@@ -1,0 +1,879 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "FixItNow API",
+    "version": "1.0.0",
+    "description": "Swagger/OpenAPI documentation for FixItNow backend API"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth"
+    },
+    {
+      "name": "Public"
+    },
+    {
+      "name": "Bookings"
+    },
+    {
+      "name": "Payments"
+    },
+    {
+      "name": "Reviews"
+    },
+    {
+      "name": "Technician"
+    },
+    {
+      "name": "Admin"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "ValidationError": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": false },
+          "message": { "type": "string", "example": "Validation error" },
+          "errorDetails": { "type": "string", "example": "bookingId is required and must be a string" }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "tags": ["Public"],
+        "summary": "Health check",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "example": "Initializing FixItNow!"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Register user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "name": "Rahim Uddin",
+                "email": "rahim.customer@example.com",
+                "password": "Password@123",
+                "role": "CUSTOMER",
+                "phone": "01700000000",
+                "address": "Dhaka, Bangladesh",
+                "profileImg": "https://example.com/profile.jpg"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "statusCode": 201,
+                  "message": "User registered successfully!",
+                  "data": {
+                    "user": {
+                      "id": "user-123",
+                      "name": "Rahim Uddin",
+                      "email": "rahim.customer@example.com",
+                      "role": "CUSTOMER",
+                      "status": "UNBAN",
+                      "phone": "01700000000",
+                      "address": "Dhaka, Bangladesh",
+                      "profileImg": "https://example.com/profile.jpg",
+                      "createdAt": "2026-07-10T00:00:00.000Z",
+                      "updatedAt": "2026-07-10T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Login user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "email": "rahim.customer@example.com",
+                "password": "Password@123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User logged in successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "statusCode": 200,
+                  "message": "User logged in successfully!",
+                  "data": {
+                    "user": {
+                      "id": "user-123",
+                      "name": "Rahim Uddin",
+                      "email": "rahim.customer@example.com",
+                      "role": "CUSTOMER"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Get current user",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Authenticated user profile",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "statusCode": 200,
+                  "message": "User profile fetched successfully",
+                  "data": {
+                    "profile": {
+                      "id": "user-123",
+                      "name": "Rahim Uddin",
+                      "email": "rahim.customer@example.com",
+                      "role": "CUSTOMER",
+                      "status": "UNBAN"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/services": {
+      "get": {
+        "tags": ["Public"],
+        "summary": "Get all services",
+        "responses": {
+          "200": {
+            "description": "Services fetched successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "statusCode": 200,
+                  "message": "Services fetched successfully",
+                  "data": [
+                    {
+                      "id": "service-123",
+                      "name": "Kitchen Leak Fixing",
+                      "description": "Fix kitchen sink and pipe leakage",
+                      "price": 700,
+                      "categoryId": "category-123",
+                      "technicianId": "tech-profile-123"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Technician"],
+        "summary": "Create service (technician only)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "name": "Bathroom Pipe Repair",
+                "description": "Repair and replacement of bathroom pipes",
+                "price": 1200,
+                "categoryId": "category-123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Service created successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "statusCode": 201,
+                  "message": "Service created successfully",
+                  "data": {
+                    "id": "service-456",
+                    "name": "Bathroom Pipe Repair",
+                    "description": "Repair and replacement of bathroom pipes",
+                    "price": 1200,
+                    "categoryId": "category-123"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/bookings": {
+      "post": {
+        "tags": ["Bookings"],
+        "summary": "Create booking",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "serviceId": "service-123",
+                "slotDateTime": "2026-07-10T14:30:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Booking created successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "statusCode": 201,
+                  "message": "Booking created successfully",
+                  "data": {
+                    "id": "booking-123",
+                    "customerId": "user-123",
+                    "technicianId": "tech-profile-123",
+                    "serviceId": "service-123",
+                    "slotDateTime": "2026-07-10T14:30:00.000Z",
+                    "status": "REQUESTED"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Bookings"],
+        "summary": "Get my bookings",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Bookings fetched successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "statusCode": 200,
+                  "message": "Bookings fetched successfully",
+                  "data": [
+                    {
+                      "id": "booking-123",
+                      "status": "REQUESTED"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/bookings/{id}": {
+      "get": {
+        "tags": ["Bookings"],
+        "summary": "Get booking by id",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Booking fetched successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "statusCode": 200,
+                  "message": "Booking fetched successfully",
+                  "data": {
+                    "id": "booking-123",
+                    "status": "REQUESTED"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/create": {
+      "post": {
+        "tags": ["Payments"],
+        "summary": "Create Stripe payment session",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "bookingId": "booking-123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Payment session created successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "statusCode": 201,
+                  "message": "Payment session created successfully",
+                  "data": {
+                    "payment": {
+                      "id": "payment-123",
+                      "bookingId": "booking-123",
+                      "transactionId": "cs_test_xxx",
+                      "amount": 700,
+                      "provider": "STRIPE",
+                      "status": "PENDING"
+                    },
+                    "checkoutUrl": "https://checkout.stripe.com/c/pay/cs_test_xxx",
+                    "sessionId": "cs_test_xxx"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/confirm": {
+      "post": {
+        "tags": ["Payments"],
+        "summary": "Confirm payment",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "sessionId": "cs_test_xxx"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Payment confirmed successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "statusCode": 200,
+                  "message": "Payment confirmed successfully",
+                  "data": {
+                    "id": "payment-123",
+                    "bookingId": "booking-123",
+                    "transactionId": "cs_test_xxx",
+                    "amount": 700,
+                    "provider": "STRIPE",
+                    "status": "COMPLETED"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments": {
+      "get": {
+        "tags": ["Payments"],
+        "summary": "Get my payments",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Payments fetched successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "statusCode": 200,
+                  "message": "Payments fetched successfully",
+                  "data": [
+                    {
+                      "id": "payment-123",
+                      "transactionId": "cs_test_xxx",
+                      "status": "COMPLETED"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/{id}": {
+      "get": {
+        "tags": ["Payments"],
+        "summary": "Get payment by id",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Payment fetched successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "statusCode": 200,
+                  "message": "Payment fetched successfully",
+                  "data": {
+                    "id": "payment-123",
+                    "status": "COMPLETED"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/webhook": {
+      "post": {
+        "tags": ["Payments"],
+        "summary": "Stripe webhook",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "id": "evt_123",
+                "type": "checkout.session.completed"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook processed successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "Webhook processed successfully",
+                  "errorDetails": null,
+                  "data": {
+                    "received": true,
+                    "processed": true
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reviews": {
+      "post": {
+        "tags": ["Reviews"],
+        "summary": "Create review",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "bookingId": "booking-123",
+                "rating": 5,
+                "comment": "Very good and fast service"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Review created successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "statusCode": 201,
+                  "message": "Review created successfully",
+                  "data": {
+                    "id": "review-123",
+                    "rating": 5,
+                    "comment": "Very good and fast service"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Reviews"],
+        "summary": "Get my reviews",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Reviews fetched successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "statusCode": 200,
+                  "message": "Reviews fetched successfully",
+                  "data": [
+                    {
+                      "id": "review-123",
+                      "rating": 5,
+                      "comment": "Very good and fast service"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Get all users",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Users fetched successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "statusCode": 200,
+                  "message": "Users fetched successfully",
+                  "data": [
+                    {
+                      "id": "user-123",
+                      "name": "Rahim Uddin",
+                      "email": "rahim.customer@example.com",
+                      "role": "CUSTOMER"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users/{id}": {
+      "patch": {
+        "tags": ["Admin"],
+        "summary": "Update user status",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "status": "BANNED"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User status updated successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "statusCode": 200,
+                  "message": "User status updated successfully",
+                  "data": {
+                    "id": "user-123",
+                    "status": "BANNED"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/bookings": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Get all bookings",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Bookings fetched successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "statusCode": 200,
+                  "message": "Bookings fetched successfully",
+                  "data": [
+                    {
+                      "id": "booking-123",
+                      "status": "REQUESTED"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/categories": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Get all categories",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Categories fetched successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "statusCode": 200,
+                  "message": "Categories fetched successfully",
+                  "data": [
+                    {
+                      "id": "category-123",
+                      "name": "plumbing",
+                      "description": "dfdaf"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Admin"],
+        "summary": "Create category",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "name": "electrical",
+                "description": "Electrical repair and installation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Category created successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "statusCode": 201,
+                  "message": "Category created successfully",
+                  "data": {
+                    "id": "category-456",
+                    "name": "electrical",
+                    "description": "Electrical repair and installation"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/technician/profile": {
+      "put": {
+        "tags": ["Technician"],
+        "summary": "Update technician profile",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "name": "Tech One",
+                "phone": "01711111111",
+                "address": "Dhaka, Bangladesh",
+                "profileImg": "https://example.com/tech.jpg",
+                "skills": ["Plumbing", "Pipe Repair"],
+                "bio": "6+ years experienced professional plumber.",
+                "experience": 6,
+                "hourlyRate": 800
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Technician profile updated successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "statusCode": 200,
+                  "message": "Technician profile updated successfully",
+                  "data": {
+                    "id": "tech-profile-123"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/technician/availability": {
+      "put": {
+        "tags": ["Technician"],
+        "summary": "Update technician availability",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": [
+                {
+                  "dayOfWeek": "MONDAY",
+                  "startTime": "10:00",
+                  "endTime": "18:00",
+                  "isAvailable": true
+                }
+              ]
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Availability slot upserted successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "statusCode": 200,
+                  "message": "Availability slot upserted successfully",
+                  "data": []
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/technician/bookings": {
+      "get": {
+        "tags": ["Technician"],
+        "summary": "Get technician bookings",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Technician bookings fetched successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "statusCode": 200,
+                  "message": "Technician bookings fetched successfully",
+                  "data": [
+                    {
+                      "id": "booking-123",
+                      "status": "REQUESTED"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/technician/bookings/{id}": {
+      "patch": {
+        "tags": ["Technician"],
+        "summary": "Update booking status",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "status": "ACCEPTED"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Booking status updated successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "statusCode": 200,
+                  "message": "Booking status updated successfully",
+                  "data": {
+                    "id": "booking-123",
+                    "status": "ACCEPTED"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
